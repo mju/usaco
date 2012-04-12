@@ -4,7 +4,6 @@ LANG: C
 TASK: ariprog
 */
 #include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 
 #define M 250
