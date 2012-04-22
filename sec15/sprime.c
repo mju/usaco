@@ -1,17 +1,17 @@
 /*
 ID: mickeyj1
 LANG: C
-TASK: pprime
+TASK: sprime
 */
+/* WARNING: this code is not well-written, please do better. */
+/* or go to the analysis page on usaco site to see what's wrong. */
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
 
-/* since sqart(100,000,000) == 10,000 */
-#define N 4999
+#define N 1000000
 #define NOT_A_PRIME 0
 #define IS_A_PRIME 1
-#define MAX_NUM_DIGITS 9
 #define IS_PRIME(X) is_prime(sieve, N, X)
 
 /*
@@ -76,37 +76,38 @@ is_prime(char* sieve, int n, int num) {
   return IS_A_PRIME;
 }
 
-int
-num_digits(int d) {
-  int r = 0;
-  while (d) {
-    r++;
-    d /= 10;
+void
+backtrack(int n, int num_digits, int* d, char* sieve, FILE* fout) {
+  if (n == num_digits) {
+    fprintf(fout, "%d\n", *d);
   }
-  return r;
-}
-
-int
-pow_ten(int p) {
-  int r = 1;
+  int tmp;
   int i;
-  for (i = 0; i < p; i++) {
-    r *= 10;
-  }
-  return r;
-}
 
-int
-get_palindrome(int d, int num_digits) {
-  int _d = d;
-  if ((num_digits & 0x1) == 1) {
-    _d /= 10;
+  tmp = *d;
+  *d = *d * 10 + 1;
+  if (IS_PRIME(*d)) {
+    backtrack(n + 1, num_digits, d, sieve, fout);
   }
-  while (_d) {
-    d = d * 10 + _d % 10;
-    _d /= 10;
+  *d = tmp;
+
+  if (n == 0) {
+    tmp = *d;
+    *d = *d * 10 + 2;
+    if (IS_PRIME(*d)) {
+      backtrack(n + 1, num_digits, d, sieve, fout);
+    }
+    *d = tmp;
   }
-  return d;
+
+  for (i = 3; i < 10; i += 2) {
+    tmp = *d;
+    *d = *d * 10 + i;
+    if (IS_PRIME(*d)) {
+      backtrack(n + 1, num_digits, d, sieve, fout);
+    }
+    *d = tmp;
+  }
 }
 
 int
@@ -114,41 +115,16 @@ main(int argc, char** argv) {
   char sieve[N];
   get_primes(sieve, N);
 
-  FILE* fin = fopen("pprime.in", "r");
+  FILE* fin = fopen("sprime.in", "r");
   assert(fin != NULL);
-  int lower, upper;
-  fscanf(fin, "%d %d", &lower, &upper);
+  int num_digits;
+  fscanf(fin, "%d", &num_digits);
   fclose(fin);
 
-  FILE* fout = fopen("pprime.out", "w");
+  FILE* fout = fopen("sprime.out", "w");
   assert(fout != NULL);
-
-  int digit;
-  int digit_lower = num_digits(lower);
-  int digit_upper = num_digits(upper);
-  int ceiling;
-  int ceiling_x_ten;
-  int palindrome;
-  int i;
-  for (digit = digit_lower; digit <= digit_upper; digit++) {
-    ceiling = (digit >> 1) + (digit & 0x1);
-    if (digit == digit_lower) {
-      i = lower / (pow_ten(digit_lower >> 1));
-      ceiling_x_ten = pow_ten(ceiling);
-    } else {
-      i = pow_ten(ceiling - 1);
-      ceiling_x_ten = i * 10;
-    }
-    for (; i < ceiling_x_ten; i++) {
-      palindrome = get_palindrome(i, digit);
-      if (IS_PRIME(palindrome) && palindrome >= lower && palindrome <= upper) {
-        fprintf(fout, "%d\n", palindrome);
-      } else if (palindrome > upper) {
-        break;
-      }
-    }
-  }
-
+  int d = 0;
+  backtrack(0, num_digits, &d, sieve, fout);
   fclose(fout);
 
   return 0;
