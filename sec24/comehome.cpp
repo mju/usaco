@@ -3,6 +3,9 @@ ID: mickeyj1
 TASK: comehome
 LANG: C++
 */
+/* WARNING: the algorithm is not optimized.  Run BFS starting from
+ * the two exits simultaneously.
+ */
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
