@@ -3,6 +3,9 @@ ID: mickeyj1
 TASK: inflate
 LANG: C
 */
+/* WARNING: not the best solution given that dp_tbl[total_minutes]
+ * always contains the maximum of points which can be achieved.
+ */
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
